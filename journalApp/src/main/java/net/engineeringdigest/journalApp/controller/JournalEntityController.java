@@ -4,6 +4,8 @@ import net.engineeringdigest.journalApp.Services.JournalEntityServices;
 import net.engineeringdigest.journalApp.entity.JournalEntity;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -18,36 +20,53 @@ public class JournalEntityController {
     private JournalEntityServices journalEntityServices;
 
     @GetMapping
-    public List<JournalEntity> getJournal() {
-        return journalEntityServices.getAllJournal();
+    public ResponseEntity<?> getJournal() {
+
+        List<JournalEntity> list = journalEntityServices.getAllJournal();
+        if (list != null && !list.isEmpty()) {
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
-    public JournalEntity enterData(@RequestBody JournalEntity journalEntity) {
-        journalEntity.setDate(LocalDateTime.now());// using the date can be added "LocalDateTime.now()" as we do not giving date
-        journalEntityServices.saveEntry(journalEntity);
-        return journalEntity;
+    public ResponseEntity<?> enterData(@RequestBody JournalEntity journalEntity) {// ? wild card mean we can return not only JournalEntity
+        try {
+            journalEntity.setDate(LocalDateTime.now());// using the date can be added "LocalDateTime.now()" as we do not giving date
+            journalEntityServices.saveEntry(journalEntity);
+            return new ResponseEntity<>(journalEntity, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/id/{myId}")
-    public JournalEntity getJournal(@PathVariable ObjectId myId) {
-        return journalEntityServices.getJournalById(myId).orElse(null);
+    public ResponseEntity<?> getJournal(@PathVariable ObjectId myId) {
+        Optional<JournalEntity> journalEntity = journalEntityServices.getJournalById(myId);
+        if (journalEntity.isPresent()) {
+            return new ResponseEntity<>(journalEntity.get(), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @DeleteMapping("/id/{myId}")
-    public boolean deleteJournal(@PathVariable ObjectId myId) {
-        journalEntityServices.deleteJournal(myId);
-        return true;
+    public ResponseEntity<?> deleteJournal(@PathVariable ObjectId myId) {
+        try {
+            return new ResponseEntity<>(myId, HttpStatus.NO_CONTENT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/id/{myId}")
-    public JournalEntity editJournal(@RequestBody JournalEntity journalEntity, @PathVariable ObjectId myId) {
+    public ResponseEntity<?> editJournal(@RequestBody JournalEntity journalEntity, @PathVariable ObjectId myId) {
         JournalEntity old = journalEntityServices.getJournalById(myId).orElse(null);
         if (old != null) {
             old.setTitle(journalEntity.getTitle() != null && !journalEntity.getTitle().isEmpty() ? journalEntity.getTitle() : old.getTitle());
             old.setContain(journalEntity.getContain() != null && !journalEntity.getContain().isEmpty() ? journalEntity.getContain() : old.getContain());
+            journalEntityServices.saveEntry(old);
+            return new ResponseEntity<>(old, HttpStatus.OK);
         }
-        journalEntityServices.saveEntry(old);
-        return old;
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
