@@ -1,6 +1,7 @@
 package net.engineeringdigest.journalApp.controller;
 
 import net.engineeringdigest.journalApp.Services.JournalEntityServices;
+import net.engineeringdigest.journalApp.Services.UsersServices;
 import net.engineeringdigest.journalApp.entity.JournalEntity;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,22 +19,24 @@ public class JournalEntityController {
 
     @Autowired
     private JournalEntityServices journalEntityServices;
+    @Autowired
+    private UsersServices userServices;
 
-    @GetMapping
-    public ResponseEntity<?> getJournal() {
+    @GetMapping("/{userName}")
+    public ResponseEntity<?> getJournal(@PathVariable String userName) {
 
-        List<JournalEntity> list = journalEntityServices.getAllJournal();
+        List<JournalEntity> list = userServices.findByUsername(userName).getJournalEntityList();
         if (list != null && !list.isEmpty()) {
             return new ResponseEntity<>(list, HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @PostMapping
-    public ResponseEntity<?> enterData(@RequestBody JournalEntity journalEntity) {// ? wild card mean we can return not only JournalEntity
+    @PostMapping("/{userName}")
+    public ResponseEntity<?> enterData(@RequestBody JournalEntity journalEntity, @PathVariable String userName) {// ? wild card mean we can return not only JournalEntity
         try {
             journalEntity.setDate(LocalDateTime.now());// using the date can be added "LocalDateTime.now()" as we do not giving date
-            journalEntityServices.saveEntry(journalEntity);
+            journalEntityServices.saveEntry(journalEntity , userName);
             return new ResponseEntity<>(journalEntity, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -49,8 +52,9 @@ public class JournalEntityController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping("/id/{myId}")
-    public ResponseEntity<?> deleteJournal(@PathVariable ObjectId myId) {
+    @DeleteMapping("/{userName}/{myId}")
+    public ResponseEntity<?> deleteJournal(@PathVariable ObjectId myId,@PathVariable String userName) {
+        journalEntityServices.deleteJournal(myId,userName);
         try {
             return new ResponseEntity<>(myId, HttpStatus.NO_CONTENT);
         } catch (Exception e) {
