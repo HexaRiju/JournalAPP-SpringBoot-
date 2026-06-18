@@ -25,4 +25,5 @@ public class Users {
     private String password;
     @DBRef // use this for referancing the table JournalEntity , as we are connecting the two db.
     private List<JournalEntity> journalEntityList = new ArrayList<>();
+    private List<String> roles = new ArrayList<>();
 }
