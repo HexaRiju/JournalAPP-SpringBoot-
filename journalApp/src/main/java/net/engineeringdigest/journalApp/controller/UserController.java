@@ -34,7 +34,7 @@ public class UserController {
         Users userInDB = userServices.findByUsername(username);
         userInDB.setUsername(user.getUsername());
         userInDB.setPassword(user.getPassword());
-        userServices.saveEntry(userInDB);
+        userServices.saveUser(userInDB);
         return userInDB;
     }
 

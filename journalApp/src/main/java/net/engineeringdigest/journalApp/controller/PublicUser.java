@@ -29,7 +29,7 @@ public class PublicUser {
 
     @PostMapping("/create")
     public Users create(@RequestBody Users user){
-        userServices.saveEntry(user);
+        userServices.saveNewUser(user);
         return user;
     }
 
