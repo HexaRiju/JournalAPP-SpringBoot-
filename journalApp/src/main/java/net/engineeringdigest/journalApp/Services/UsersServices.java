@@ -1,8 +1,6 @@
 package net.engineeringdigest.journalApp.Services;
 
-import net.engineeringdigest.journalApp.entity.JournalEntity;
 import net.engineeringdigest.journalApp.entity.Users;
-import net.engineeringdigest.journalApp.repository.JavaEntityRepository;
 import net.engineeringdigest.journalApp.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +17,14 @@ public class UsersServices {
     @Autowired
     private UserRepository userRepository;
     public static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-    public void saveEntry(Users user) {
+    public void saveNewUser(Users user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Arrays.asList("USER"));
         userRepository.save(user);
     }
-
+    public void saveUser(Users user) {
+        userRepository.save(user);
+    }
     public List<Users> getAllUsers() {
         return userRepository.findAll();
     }
