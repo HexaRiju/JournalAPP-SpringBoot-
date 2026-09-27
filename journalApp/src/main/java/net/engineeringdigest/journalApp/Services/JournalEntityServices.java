@@ -22,9 +22,9 @@ public class JournalEntityServices {
         JournalEntity saved =  javaEntityRepository.save(journalEntity);// save in the journal_entity collection
         Users user = usersServices.findByUsername(userName);
         user.getJournalEntityList().add(saved);// then enter the saved data in the recomended user
-        usersServices.saveEntry(user);// save the user .
+        usersServices.saveUser(user);// save in the user which is already present.
     }
-public void saveEntry(JournalEntity journalEntity) {
+    public void saveEntry(JournalEntity journalEntity) {
         javaEntityRepository.save(journalEntity);
 }
     public List<JournalEntity> getAllJournal() {
@@ -34,11 +34,16 @@ public void saveEntry(JournalEntity journalEntity) {
     public Optional<JournalEntity> getJournalById(ObjectId id) {
         return javaEntityRepository.findById(id);// optional return , mean if present then return or null,
     }
-
+    @Transactional
     public void deleteJournal(ObjectId id, String userName) {
         Users user = usersServices.findByUsername(userName);
-        user.getJournalEntityList().removeIf(j -> j.getId().equals(id));
-        usersServices.saveEntry(user);
-        javaEntityRepository.deleteById(id);
+        try {
+            user.getJournalEntityList().removeIf(j -> j.getId().equals(id));
+            usersServices.saveUser(user);
+            javaEntityRepository.deleteById(id);
+        }
+        catch(Exception e){
+            throw new RuntimeException("Error deleting journal entry: " + e.getMessage());
+        }
     }
 }
