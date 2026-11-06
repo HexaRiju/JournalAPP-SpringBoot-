@@ -15,6 +15,7 @@
     <description>E2EE Journal App</description>
     <properties>
         <java.version>1.8</java.version>
+        <sonar.organization>hexariju</sonar.organization>
     </properties>
     <dependencies>
         <dependency>
@@ -45,13 +46,23 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-bom</artifactId>
-            <version>5.11.1</version>
+            <version>5.12.0</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

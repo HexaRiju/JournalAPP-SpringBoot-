@@ -16,15 +16,24 @@ import java.util.Optional;
 public class UsersServices {
     @Autowired
     private UserRepository userRepository;
-    public static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public void saveNewUser(Users user) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles(Arrays.asList("USER"));
         userRepository.save(user);
     }
+
+    public void saveNewAdmin(Users user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(Arrays.asList("USER", "ADMIN"));
+        userRepository.save(user);
+    }
+
     public void saveUser(Users user) {
         userRepository.save(user);
     }
+
     public List<Users> getAllUsers() {
         return userRepository.findAll();
     }

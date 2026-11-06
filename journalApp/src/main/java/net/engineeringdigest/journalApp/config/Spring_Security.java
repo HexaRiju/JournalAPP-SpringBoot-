@@ -21,7 +21,8 @@ public class Spring_Security extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/journal/**","/user/**").authenticated()// the star mean anything after that
+                .antMatchers("/journal/**","/user/**").authenticated()
+                .antMatchers("/admin/").hasRole("ADMIN")// the star mean anything after that
                 .anyRequest().permitAll()
                 .and()
                 .httpBasic();
